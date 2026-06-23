@@ -1,0 +1,1390 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Economía de tokens — Spartan IT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5EF;
+    --surface: #FFFFFF;
+    --surface-2: #F0EDE3;
+    --surface-3: #E5E0D2;
+    --line: #D8D2C2;
+    --line-strong: #B8AF98;
+    --text: #1A1F2E;
+    --text-2: #4A5468;
+    --text-3: #8A8676;
+    --amber: #B86F1F;
+    --amber-dim: #D89456;
+    --cyan: #2A8A82;
+    --danger: #B85540;
+    --ok: #5F7F3F;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --sans: 'Inter', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 15px; line-height: 1.55; }
+  body {
+    background-image:
+      linear-gradient(rgba(184,175,152,0.18) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(184,175,152,0.18) 1px, transparent 1px);
+    background-size: 64px 64px;
+    background-position: -1px -1px;
+    background-attachment: fixed;
+    background-color: var(--bg);
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 50% -10%, rgba(184,111,31,0.06), transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+  .container { max-width: 1180px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  /* Header */
+  header { padding: 40px 0 24px; border-bottom: 1px solid var(--line); margin-bottom: 0; }
+  .brand {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-3); display: flex; align-items: center; gap: 12px;
+  }
+  .brand::before {
+    content: ''; width: 8px; height: 8px; background: var(--amber); border-radius: 50%;
+  }
+  h1 {
+    font-family: var(--mono); font-weight: 700; font-size: clamp(36px, 6vw, 64px);
+    line-height: 1.02; letter-spacing: -0.03em; margin-top: 16px;
+  }
+  h1 .accent { color: var(--amber); }
+  .subtitle {
+    margin-top: 18px; max-width: 680px; color: var(--text-2); font-size: 17px; line-height: 1.5;
+  }
+  .meta-row {
+    margin-top: 28px; display: flex; gap: 24px; flex-wrap: wrap;
+    font-family: var(--mono); font-size: 11px; color: var(--text-3);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .meta-row span { display: flex; align-items: center; gap: 8px; }
+  .meta-row span::before { content: '›'; color: var(--amber); }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 0; border-bottom: 1px solid var(--line-strong);
+    margin-top: 32px; position: sticky; top: 0; background: var(--bg); z-index: 10;
+    box-shadow: 0 4px 16px -8px rgba(26,31,46,0.08);
+  }
+  .tab {
+    background: none; border: none; color: var(--text-3); padding: 18px 24px;
+    font-family: var(--mono); font-size: 13px; font-weight: 500;
+    letter-spacing: 0.05em; cursor: pointer; position: relative;
+    transition: color 0.15s;
+  }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--amber); }
+  .tab.active::after {
+    content: ''; position: absolute; left: 0; right: 0; bottom: -1px;
+    height: 2px; background: var(--amber);
+  }
+  .tab-num {
+    font-size: 10px; color: var(--text-3); margin-right: 8px;
+    border: 1px solid var(--line); padding: 2px 6px; border-radius: 2px;
+  }
+  .tab.active .tab-num { color: var(--amber); border-color: var(--amber-dim); }
+
+  /* Panels */
+  .panel { display: none; padding: 48px 0 80px; }
+  .panel.active { display: block; }
+
+  /* Concept panel */
+  .eyebrow {
+    font-family: var(--mono); font-size: 11px; color: var(--amber);
+    letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 12px;
+  }
+  h2 {
+    font-family: var(--mono); font-weight: 700; font-size: 28px;
+    line-height: 1.15; letter-spacing: -0.01em; margin-bottom: 18px;
+  }
+  h3 {
+    font-family: var(--mono); font-weight: 600; font-size: 17px;
+    margin-bottom: 10px; color: var(--text);
+  }
+  p { color: var(--text-2); margin-bottom: 14px; }
+  p strong { color: var(--text); font-weight: 600; }
+  .lead { font-size: 17px; max-width: 760px; }
+
+  /* Anatomy flow */
+  .anatomy {
+    margin: 40px 0 56px; padding: 32px; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 4px; overflow-x: auto;
+  }
+  .anatomy-title {
+    font-family: var(--mono); font-size: 11px; color: var(--text-3);
+    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 24px;
+  }
+  .flow {
+    display: grid; grid-template-columns: auto 1fr auto;
+    gap: 20px; align-items: center;
+  }
+  @media (max-width: 720px) {
+    .anatomy { padding: 20px; }
+    .flow { grid-template-columns: 1fr; gap: 12px; }
+    .flow-source, .flow-target {
+      justify-self: center; padding: 12px 18px;
+    }
+    .flow-item { grid-template-columns: 28px 1fr 60px; }
+    .flow-item .pay { display: none; }
+  }
+  .flow-source, .flow-target {
+    font-family: var(--mono); font-size: 13px; padding: 16px 14px;
+    border: 1px solid var(--line); border-radius: 3px; text-align: center;
+    background: var(--surface-2); white-space: nowrap;
+  }
+  .flow-target { background: var(--amber); color: var(--bg); border-color: var(--amber); font-weight: 600; }
+  .flow-stack { display: flex; flex-direction: column; gap: 8px; }
+  .flow-item {
+    display: grid; grid-template-columns: 32px 1fr 80px 70px;
+    gap: 12px; align-items: center; padding: 10px 14px;
+    background: var(--surface-2); border-left: 3px solid var(--line);
+    font-family: var(--mono); font-size: 12px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .flow-item:hover { background: var(--surface-3); border-left-color: var(--amber); }
+  .flow-item .idx { color: var(--text-3); font-size: 10px; }
+  .flow-item .label { color: var(--text); font-weight: 500; }
+  .flow-item .desc { color: var(--text-3); font-size: 11px; font-family: var(--sans); }
+  .flow-item .pay { font-size: 10px; color: var(--text-3); letter-spacing: 0.1em; }
+  .flow-item.repeats .pay { color: var(--danger); }
+
+  /* Leaks grid */
+  .leaks {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 1px; background: var(--line); border: 1px solid var(--line);
+    margin-top: 32px;
+  }
+  .leak {
+    background: var(--surface); padding: 28px; position: relative;
+  }
+  .leak-num {
+    font-family: var(--mono); font-size: 11px; color: var(--amber);
+    letter-spacing: 0.15em; margin-bottom: 10px;
+  }
+  .leak h3 { margin-bottom: 14px; }
+  .leak p { font-size: 14px; margin-bottom: 10px; }
+  .leak .detect {
+    margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--line-strong);
+    font-family: var(--mono); font-size: 12px; color: var(--text-3);
+  }
+  .leak .detect b { color: var(--amber); font-weight: 500; }
+  .leak .impact {
+    margin-top: 14px; font-family: var(--mono); font-size: 11px;
+    color: var(--text-3); letter-spacing: 0.05em;
+  }
+  .leak .impact .bar {
+    display: inline-block; vertical-align: middle; height: 6px;
+    background: var(--danger); margin-left: 8px; border-radius: 1px;
+  }
+
+  /* Simulation panel */
+  .sim-grid {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+    gap: 32px; align-items: start;
+  }
+  @media (max-width: 960px) { .sim-grid { grid-template-columns: 1fr; } }
+
+  .sim-controls {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 4px; padding: 28px;
+  }
+  .control-group {
+    border-top: 1px solid var(--line); padding: 20px 0;
+  }
+  .control-group:first-child { border-top: none; padding-top: 0; }
+  .group-title {
+    font-family: var(--mono); font-size: 11px; color: var(--amber);
+    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 16px;
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .group-title .group-cost {
+    color: var(--text-3); font-size: 10px;
+  }
+  .control {
+    display: grid; grid-template-columns: 1fr 110px;
+    gap: 16px; align-items: center; margin-bottom: 12px;
+  }
+  .control:last-child { margin-bottom: 0; }
+  .control label {
+    font-size: 13px; color: var(--text-2); line-height: 1.3;
+  }
+  .control label .hint {
+    display: block; font-family: var(--mono); font-size: 10px;
+    color: var(--text-3); margin-top: 2px;
+  }
+  .control input[type="number"], .control select {
+    width: 100%; background: var(--bg); border: 1px solid var(--line);
+    color: var(--text); padding: 8px 10px; font-family: var(--mono);
+    font-size: 13px; border-radius: 2px; text-align: right;
+    -moz-appearance: textfield;
+  }
+  .control input[type="number"]::-webkit-outer-spin-button,
+  .control input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none; margin: 0;
+  }
+  .control input[type="number"]:focus, .control select:focus {
+    outline: none; border-color: var(--amber);
+  }
+  .control select { text-align: left; cursor: pointer; }
+
+  .toggle-row {
+    display: flex; flex-direction: column; gap: 10px; margin-top: 14px;
+  }
+  .toggle {
+    display: flex; align-items: center; gap: 12px; cursor: pointer;
+    padding: 10px 12px; background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 2px; transition: border-color 0.15s;
+  }
+  .toggle:hover { border-color: var(--surface-3); }
+  .toggle input { display: none; }
+  .toggle .check {
+    width: 16px; height: 16px; border: 1px solid var(--line);
+    border-radius: 2px; display: flex; align-items: center; justify-content: center;
+    background: var(--bg); flex-shrink: 0;
+  }
+  .toggle input:checked + .check { background: var(--amber); border-color: var(--amber); }
+  .toggle input:checked + .check::after {
+    content: ''; width: 8px; height: 8px; background: var(--bg); border-radius: 1px;
+  }
+  .toggle .toggle-label {
+    font-size: 13px; flex: 1;
+  }
+  .toggle .toggle-label .toggle-sub {
+    display: block; font-family: var(--mono); font-size: 10px; color: var(--text-3); margin-top: 2px;
+  }
+
+  /* Sim results */
+  .sim-results { position: sticky; top: 70px; }
+  .readout {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 4px; padding: 28px; margin-bottom: 16px;
+  }
+  .readout-eyebrow {
+    font-family: var(--mono); font-size: 10px; color: var(--text-3);
+    letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .readout-big {
+    font-family: var(--mono); font-weight: 700; font-size: 44px;
+    letter-spacing: -0.02em; color: var(--amber); line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .readout-unit { font-size: 14px; color: var(--text-3); margin-left: 6px; font-weight: 400; }
+  .readout-sub {
+    margin-top: 12px; display: flex; gap: 24px;
+    font-family: var(--mono); font-size: 12px; color: var(--text-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .readout-sub span { display: block; font-size: 10px; color: var(--text-3); letter-spacing: 0.1em; }
+  .savings {
+    background: linear-gradient(135deg, rgba(127,176,105,0.12), rgba(127,176,105,0.04));
+    border-color: var(--ok);
+  }
+  .savings .readout-big { color: var(--ok); }
+
+  .breakdown {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 4px; padding: 22px;
+  }
+  .breakdown-title {
+    font-family: var(--mono); font-size: 11px; color: var(--text-3);
+    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 16px;
+  }
+  .bar-stack {
+    height: 32px; display: flex; border-radius: 2px; overflow: hidden;
+    background: var(--surface-2); margin-bottom: 14px; border: 1px solid var(--line);
+  }
+  .bar-seg { transition: width 0.3s; min-width: 1px; }
+  .bar-legend { display: grid; gap: 6px; }
+  .bar-row {
+    display: grid; grid-template-columns: 12px 1fr auto auto;
+    gap: 10px; align-items: center;
+    font-family: var(--mono); font-size: 12px; color: var(--text-2);
+    font-variant-numeric: tabular-nums;
+  }
+  .bar-swatch { width: 12px; height: 12px; border-radius: 1px; }
+  .bar-row .bar-pct { color: var(--text-3); font-size: 11px; min-width: 44px; text-align: right; }
+  .bar-row .bar-val { min-width: 80px; text-align: right; }
+
+  /* Decision tree panel */
+  .tree-intro {
+    max-width: 720px; margin-bottom: 40px;
+  }
+  .tree {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 4px; padding: 40px; min-height: 480px;
+    position: relative;
+  }
+  .tree-step {
+    display: none; animation: fadeIn 0.3s;
+  }
+  .tree-step.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  .crumb {
+    display: flex; gap: 8px; flex-wrap: wrap; font-family: var(--mono);
+    font-size: 11px; color: var(--text-3); margin-bottom: 24px;
+    letter-spacing: 0.05em;
+  }
+  .crumb-item { color: var(--text-3); }
+  .crumb-item.curr { color: var(--amber); }
+  .crumb-sep { color: var(--line); }
+
+  .question {
+    font-family: var(--mono); font-weight: 700; font-size: 26px;
+    line-height: 1.2; margin-bottom: 12px; letter-spacing: -0.01em;
+  }
+  .question .accent { color: var(--amber); }
+  .question-help {
+    color: var(--text-2); font-size: 15px; margin-bottom: 32px; max-width: 600px;
+  }
+  .choices {
+    display: grid; gap: 10px; max-width: 720px;
+  }
+  .choice {
+    background: var(--surface-2); border: 1px solid var(--line);
+    border-radius: 3px; padding: 18px 22px; text-align: left;
+    color: var(--text); cursor: pointer; font-family: var(--sans);
+    font-size: 15px; transition: all 0.15s;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .choice:hover {
+    border-color: var(--amber); background: var(--surface-3); transform: translateX(2px);
+  }
+  .choice .choice-key {
+    font-family: var(--mono); font-size: 11px; color: var(--amber);
+    width: 24px; flex-shrink: 0;
+  }
+  .choice .choice-text { flex: 1; }
+  .choice .choice-text small {
+    display: block; color: var(--text-3); font-size: 12px; margin-top: 3px;
+    font-family: var(--mono);
+  }
+  .choice-back {
+    margin-top: 32px; background: none; border: 1px solid var(--line);
+    color: var(--text-3); padding: 10px 16px; cursor: pointer;
+    font-family: var(--mono); font-size: 12px; border-radius: 2px;
+    letter-spacing: 0.05em;
+  }
+  .choice-back:hover { color: var(--text); border-color: var(--text-3); }
+
+  /* Verdict */
+  .verdict {
+    background: var(--surface-2); border-left: 3px solid var(--amber);
+    padding: 28px 32px; border-radius: 3px;
+  }
+  .verdict h3 {
+    font-family: var(--mono); font-size: 13px; color: var(--amber);
+    letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 8px;
+  }
+  .verdict .v-title {
+    font-family: var(--mono); font-weight: 700; font-size: 24px;
+    margin-bottom: 16px; letter-spacing: -0.01em;
+  }
+  .verdict .v-body { color: var(--text-2); font-size: 15px; }
+  .verdict .v-body p { margin-bottom: 12px; }
+  .verdict .v-body ul { margin: 10px 0 12px 20px; color: var(--text-2); }
+  .verdict .v-body ul li { margin-bottom: 6px; }
+  .verdict .v-body code {
+    font-family: var(--mono); font-size: 12px; background: var(--bg);
+    padding: 2px 6px; border-radius: 2px; color: var(--amber);
+  }
+  .v-impact {
+    margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line);
+    display: flex; gap: 32px; font-family: var(--mono); font-size: 12px;
+  }
+  .v-impact > div { color: var(--text-3); letter-spacing: 0.05em; }
+  .v-impact b { display: block; color: var(--text); font-size: 18px; margin-top: 4px; font-weight: 700; }
+  .v-impact .ok b { color: var(--ok); }
+
+  footer {
+    border-top: 1px solid var(--line); padding: 32px 0 60px;
+    font-family: var(--mono); font-size: 11px; color: var(--text-3);
+    letter-spacing: 0.05em;
+  }
+  footer .container { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="brand">Spartan IT · taller interno · v1.0</div>
+    <h1>¿Dónde se va<br>la <span class="accent">plata</span> en tokens?</h1>
+    <p class="subtitle">
+      Una guía para entender el gasto real de un agente con LLM,
+      simular escenarios y decidir qué optimizar primero.
+      Pensada para diagnosticar antes de comprar herramientas.
+    </p>
+    <div class="meta-row">
+      <span>contexto: cerealera + lab clínico</span>
+      <span>público: Alberto, Tomás, Leandro</span>
+      <span>modelo de referencia: Claude Sonnet</span>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-panel="conceptos" role="tab"><span class="tab-num">01</span>Conceptos</button>
+    <button class="tab" data-panel="simulacion" role="tab"><span class="tab-num">02</span>Simulación</button>
+    <button class="tab" data-panel="arbol" role="tab"><span class="tab-num">03</span>Árbol de decisión</button>
+  </nav>
+
+  <!-- ============ TAB 1: CONCEPTOS ============ -->
+  <section class="panel active" id="conceptos">
+    <div class="eyebrow">Lectura previa</div>
+    <h2>Anatomía de una llamada al modelo</h2>
+    <p class="lead">
+      Cuando tu agente le manda una consulta al LLM, el modelo no recibe solo lo que escribió el usuario.
+      Recibe un paquete que vos armaste: instrucciones, historial, resultados de herramientas, fragmentos
+      recuperados. <strong>Todo eso se cobra como input, en cada turno.</strong>
+    </p>
+
+    <div class="anatomy">
+      <div class="anatomy-title">› flujo de una request, qué se paga en cada bloque</div>
+      <div class="flow">
+        <div class="flow-source">Aplicación<br><small style="color:var(--text-3); font-size:10px">(tu agente)</small></div>
+        <div class="flow-stack">
+          <div class="flow-item repeats">
+            <span class="idx">01</span>
+            <div>
+              <div class="label">System prompt</div>
+              <div class="desc">Instrucciones, reglas, definición de tools</div>
+            </div>
+            <span class="pay">cada turno</span>
+            <span style="color:var(--amber); font-family:var(--mono); font-size:11px; text-align:right">$ input</span>
+          </div>
+          <div class="flow-item repeats">
+            <span class="idx">02</span>
+            <div>
+              <div class="label">Historial conversación</div>
+              <div class="desc">Todos los turnos previos, completos</div>
+            </div>
+            <span class="pay">crece c/ turno</span>
+            <span style="color:var(--amber); font-family:var(--mono); font-size:11px; text-align:right">$ input</span>
+          </div>
+          <div class="flow-item">
+            <span class="idx">03</span>
+            <div>
+              <div class="label">Input del usuario</div>
+              <div class="desc">Lo que tipea esta vez</div>
+            </div>
+            <span class="pay">turno actual</span>
+            <span style="color:var(--amber); font-family:var(--mono); font-size:11px; text-align:right">$ input</span>
+          </div>
+          <div class="flow-item repeats">
+            <span class="idx">04</span>
+            <div>
+              <div class="label">Tool outputs</div>
+              <div class="desc">JSON de APIs, filas SQL, listados</div>
+            </div>
+            <span class="pay">cada tool call</span>
+            <span style="color:var(--amber); font-family:var(--mono); font-size:11px; text-align:right">$ input</span>
+          </div>
+          <div class="flow-item">
+            <span class="idx">05</span>
+            <div>
+              <div class="label">Chunks RAG</div>
+              <div class="desc">Fragmentos del retrieval, top-k</div>
+            </div>
+            <span class="pay">turno actual</span>
+            <span style="color:var(--amber); font-family:var(--mono); font-size:11px; text-align:right">$ input</span>
+          </div>
+          <div class="flow-item">
+            <span class="idx">06</span>
+            <div>
+              <div class="label">Thinking tokens</div>
+              <div class="desc">Razonamiento interno (si activado)</div>
+            </div>
+            <span class="pay">generados</span>
+            <span style="color:var(--danger); font-family:var(--mono); font-size:11px; text-align:right">$$ output</span>
+          </div>
+          <div class="flow-item">
+            <span class="idx">07</span>
+            <div>
+              <div class="label">Respuesta</div>
+              <div class="desc">Lo que ve el usuario</div>
+            </div>
+            <span class="pay">generados</span>
+            <span style="color:var(--danger); font-family:var(--mono); font-size:11px; text-align:right">$$ output</span>
+          </div>
+        </div>
+        <div class="flow-target">LLM<br><small style="font-size:10px; opacity:0.7">Anthropic /<br>OpenAI / etc</small></div>
+      </div>
+    </div>
+
+    <div class="eyebrow">Las seis fugas</div>
+    <h2>De dónde sale el gasto invisible</h2>
+    <p class="lead">
+      Cuando Alberto dice "esta consulta no era grande pero gastó un montón",
+      casi seguro la fuga está en uno de estos seis lugares.
+      Cada uno se diagnostica distinto y se arregla distinto.
+    </p>
+
+    <div class="leaks">
+      <div class="leak">
+        <div class="leak-num">01 · fuga</div>
+        <h3>System prompt inflado</h3>
+        <p>Instrucciones largas, definiciones de tools con schemas verbosos, ejemplos few-shot, reglas de negocio.
+        <strong>Se paga en cada llamada</strong>, aunque el usuario haya escrito tres palabras.</p>
+        <div class="detect"><b>Detección:</b> medí el campo <code style="color:var(--amber); font-family:var(--mono)">usage.input_tokens</code> en una llamada con input mínimo del usuario. Si ya da 5k+, es esto.</div>
+        <div class="impact">impacto típico <span class="bar" style="width:120px"></span></div>
+      </div>
+
+      <div class="leak">
+        <div class="leak-num">02 · fuga</div>
+        <h3>Tool outputs verbosos</h3>
+        <p>Una query SQL que vuelve con 500 filas, una API que retorna JSON con 80 campos por registro.
+        El modelo recibe todo aunque solo necesite tres datos. Es lo más fácil de detectar y de arreglar.</p>
+        <div class="detect"><b>Detección:</b> logueá el tamaño en bytes de cada tool response antes de mandarla al modelo. Cualquier cosa arriba de 5KB merece revisión.</div>
+        <div class="impact">impacto típico <span class="bar" style="width:140px"></span></div>
+      </div>
+
+      <div class="leak">
+        <div class="leak-num">03 · fuga</div>
+        <h3>Historial acumulado</h3>
+        <p>Si la conversación tiene memoria y van 15 turnos, el turno 16 reenvía los 15 anteriores enteros.
+        El costo total de la sesión crece <strong>cuadráticamente</strong> aunque cada turno parezca chico.</p>
+        <div class="detect"><b>Detección:</b> graficá <code style="color:var(--amber); font-family:var(--mono)">input_tokens</code> contra número de turno en una sesión real. Si sube en pendiente, es esto.</div>
+        <div class="impact">impacto típico <span class="bar" style="width:100px"></span></div>
+      </div>
+
+      <div class="leak">
+        <div class="leak-num">04 · fuga</div>
+        <h3>RAG sobredimensionado</h3>
+        <p>Top-20 chunks de 500 tokens = 10.000 tokens de contexto por consulta. Muchas implementaciones
+        traen demasiado "por las dudas" cuando top-5 con buen umbral de similitud rinde igual o mejor.</p>
+        <div class="detect"><b>Detección:</b> mirá tu config de retriever. <code style="color:var(--amber); font-family:var(--mono)">k</code> arriba de 10 sin tuning explícito es sospechoso.</div>
+        <div class="impact">impacto típico <span class="bar" style="width:90px"></span></div>
+      </div>
+
+      <div class="leak">
+        <div class="leak-num">05 · fuga</div>
+        <h3>Reintentos y loops silenciosos</h3>
+        <p>Si el agente falla un tool call (JSON mal formado, schema invalido, timeout), el framework reintenta.
+        Pagás dos, tres, cinco veces la misma consulta. <strong>LangGraph y Agno son los peores ofensores</strong>
+        porque sus loops de "self-correction" pueden iterar 8-10 veces antes de rendirse, y todo eso se cobra.</p>
+        <div class="detect"><b>Detección:</b> en logs, buscá patrones tipo
+        <code style="color:var(--amber); font-family:var(--mono)">tool_use → tool_result (error) → tool_use → tool_result (error)</code>
+        repetidos. Contá llamadas a <code style="color:var(--amber); font-family:var(--mono)">/v1/messages</code> por interacción del usuario — debería ser ~1, no 3-5. En LangGraph activá <code style="color:var(--amber); font-family:var(--mono)">recursion_limit</code> bajo (5) y revisá los <code style="color:var(--amber); font-family:var(--mono)">RecursionError</code>.</div>
+        <div class="impact">impacto típico <span class="bar" style="width:70px"></span></div>
+      </div>
+
+      <div class="leak">
+        <div class="leak-num">06 · fuga</div>
+        <h3>Thinking / extended reasoning</h3>
+        <p>Si activaste modelos con thinking extendido, esos tokens cuentan como output (los más caros)
+        y no aparecen en la respuesta visible. Útil para tareas complejas, derroche puro en tareas simples.</p>
+        <div class="detect"><b>Detección:</b> el response tiene <code style="color:var(--amber); font-family:var(--mono)">usage.output_tokens</code> mucho mayor al texto visible. Revisar config.</div>
+        <div class="impact">impacto típico <span class="bar" style="width:80px"></span></div>
+      </div>
+
+      <div class="leak">
+        <div class="leak-num">07 · fuga</div>
+        <h3>Consultas repetitivas sin caché</h3>
+        <p>Luciana recibe 40 veces por semana "¿cuál es mi saldo?" formulado de 15 maneras distintas.
+        Cada vez se paga el LLM completo aunque la respuesta sea idéntica. <strong>Es la fuga más fácil
+        de capturar en agentes de soporte B2B</strong>, donde el long-tail de consultas se concentra en pocos patrones.</p>
+        <div class="detect"><b>Detección:</b> embebé las últimas 1000 queries y agrupalas por similitud coseno > 0.92. Si el top-20 clusters concentra el 50%+ del tráfico, hay caché semántico esperando.</div>
+        <div class="impact">impacto típico <span class="bar" style="width:110px"></span></div>
+      </div>
+
+      <div class="leak">
+        <div class="leak-num">08 · fuga</div>
+        <h3>Prompt drift silencioso</h3>
+        <p>Alguien retoca el system prompt para arreglar un caso edge y sin querer agrega 600 tokens
+        que se pagan en cada llamada futura. Con tres personas tocando el mismo agente, el prompt crece
+        15% por mes sin que nadie lo note hasta que llega la factura.</p>
+        <div class="detect"><b>Detección:</b> versionar el system prompt en git con tag por release. Graficar tokens del system prompt en el tiempo. Cualquier salto sin justificación de feature merece auditoría.</div>
+        <div class="impact">impacto típico <span class="bar" style="width:60px"></span></div>
+      </div>
+    </div>
+
+    <div style="margin-top: 40px; padding: 24px 28px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px;">
+      <div class="eyebrow" style="color: var(--text-3)">› nota sobre herramientas externas</div>
+      <h3 style="margin-bottom: 10px; font-size: 15px;">¿Y los compresores tipo Headroom?</h3>
+      <p style="font-size: 14px; margin-bottom: 0;">
+        Hay proyectos como <strong>Headroom</strong> que se ofrecen como capa de compresión entre tu agente y el LLM:
+        interceptan el contexto, comprimen lo redundante (sobre todo JSON, logs y código) y guardan el original local
+        por si el modelo necesita el detalle. Funcionan bien en escenarios de alto volumen con tool outputs muy verbosos
+        (logs SRE, builds, queries masivas). En flujos B2B moderados rinden poco, porque ahí los wins están en el diseño
+        del agente, no en comprimir genéricamente. Se evalúa en la pestaña de decisión cuando corresponde.
+      </p>
+    </div>
+
+    <div style="margin-top: 24px; padding: 28px; background: var(--surface-2); border-left: 3px solid var(--cyan); border-radius: 3px;">
+      <div class="eyebrow" style="color: var(--cyan)">› primer paso, siempre</div>
+      <h3 style="margin-bottom: 12px;">Instrumentá antes de comprar</h3>
+      <p style="margin-bottom: 0;">
+        El API de Anthropic devuelve <code style="font-family:var(--mono); color:var(--amber); background:var(--bg); padding:2px 6px; border-radius:2px">usage</code>
+        detallado en cada respuesta: input, output, cache_read, cache_write.
+        Con loguear esos cuatro números a una tabla en 50 consultas reales, en una tarde sabés dónde está la fuga.
+        Sin esa medición, optimizar es a ciegas.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ TAB 2: SIMULACIÓN ============ -->
+  <section class="panel" id="simulacion">
+    <div style="display:flex; align-items:baseline; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+      <div>
+        <div class="eyebrow">Calculadora reactiva</div>
+        <h2>Meté los números de tu caso</h2>
+      </div>
+      <button id="sim-reset" style="background:none; border:1px solid var(--line); color:var(--text-3); padding:8px 14px; font-family:var(--mono); font-size:11px; letter-spacing:0.1em; cursor:pointer; border-radius:2px; text-transform:uppercase;">↺ resetear valores</button>
+    </div>
+    <p class="lead" style="margin-bottom: 12px;">
+      Ajustá los parámetros del lado izquierdo y mirá cómo se descompone el gasto a la derecha.
+      Activá los <em>quick wins</em> al final para ver cuánto se ahorra con cada uno.
+      Empezá con los valores precargados (típicos de un agente para la cerealera) y movelos.
+    </p>
+    <p style="font-family: var(--mono); font-size: 11px; color: var(--text-3); margin-bottom: 32px; letter-spacing: 0.03em;">
+      › precios de referencia jun-2026, verificar contra <span style="color:var(--amber)">docs.anthropic.com</span>.
+      el cálculo de caching asume 95% hit rate post-warmup y promedia el costo del primer write (1.25x) con los reads (0.1x).
+    </p>
+
+    <div class="sim-grid">
+      <!-- CONTROLS -->
+      <div class="sim-controls">
+        <div class="control-group">
+          <div class="group-title"><span>Modelo y volumen</span><span class="group-cost" id="cost-base">base</span></div>
+          <div class="control">
+            <label>Modelo
+              <span class="hint">precios input / output por 1M tokens</span>
+            </label>
+            <select id="model">
+              <option value="haiku" data-in="1" data-out="5">Haiku · $1/$5</option>
+              <option value="sonnet" data-in="3" data-out="15" selected>Sonnet · $3/$15</option>
+              <option value="opus" data-in="15" data-out="75">Opus · $15/$75</option>
+            </select>
+          </div>
+          <div class="control">
+            <label>Llamadas por día</label>
+            <input type="number" id="calls-day" value="800" min="1" max="100000">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="group-title"><span>Input que va al modelo</span><span class="group-cost" id="cost-input">— tok/llamada</span></div>
+          <div class="control">
+            <label>System prompt
+              <span class="hint">instrucciones + schema de tools</span>
+            </label>
+            <input type="number" id="sys-prompt" value="4500" min="0" max="200000">
+          </div>
+          <div class="control">
+            <label>Turnos previos en historial
+              <span class="hint">promedio por sesión</span>
+            </label>
+            <input type="number" id="turns" value="6" min="0" max="100">
+          </div>
+          <div class="control">
+            <label>Tokens promedio por turno previo</label>
+            <input type="number" id="turn-size" value="350" min="0" max="50000">
+          </div>
+          <div class="control">
+            <label>Input del usuario (turno actual)</label>
+            <input type="number" id="user-input" value="80" min="0" max="50000">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="group-title"><span>Tool calls y RAG</span><span class="group-cost" id="cost-tools">— tok/llamada</span></div>
+          <div class="control">
+            <label>Tool calls por turno</label>
+            <input type="number" id="tools-n" value="2" min="0" max="50">
+          </div>
+          <div class="control">
+            <label>Tokens promedio por tool output
+              <span class="hint">filas SQL, JSON de API, etc.</span>
+            </label>
+            <input type="number" id="tool-size" value="2800" min="0" max="100000">
+          </div>
+          <div class="control">
+            <label>Chunks RAG (top-k)</label>
+            <input type="number" id="rag-k" value="8" min="0" max="100">
+          </div>
+          <div class="control">
+            <label>Tokens por chunk</label>
+            <input type="number" id="rag-size" value="450" min="0" max="10000">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="group-title"><span>Output que genera el modelo</span><span class="group-cost" id="cost-output">— tok/llamada</span></div>
+          <div class="control">
+            <label>Thinking tokens
+              <span class="hint">0 si no usás extended thinking</span>
+            </label>
+            <input type="number" id="thinking" value="0" min="0" max="50000">
+          </div>
+          <div class="control">
+            <label>Respuesta visible</label>
+            <input type="number" id="response" value="280" min="0" max="50000">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="group-title"><span>Overhead de reintentos</span><span class="group-cost" id="cost-retry">×1.0</span></div>
+          <div class="control">
+            <label>Multiplicador de reintentos
+              <span class="hint">1.0 = sin reintentos. 1.3 = el 30% de las llamadas reintenta una vez</span>
+            </label>
+            <input type="number" id="retry-mult" value="1.0" min="1" max="10" step="0.1">
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="group-title"><span>Quick wins a aplicar</span><span class="group-cost">simulación</span></div>
+          <div class="toggle-row">
+            <label class="toggle">
+              <input type="checkbox" id="qw-cache">
+              <span class="check"></span>
+              <span class="toggle-label">Prompt caching del system prompt
+                <span class="toggle-sub">cache_read = 10% del precio base · ahorro grande sin tocar arquitectura</span>
+              </span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="qw-semcache">
+              <span class="check"></span>
+              <span class="toggle-label">Caché semántico de respuestas (−30% llamadas)
+                <span class="toggle-sub">queries similares devuelven respuesta cacheada sin llamar al LLM</span>
+              </span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="qw-trunc">
+              <span class="check"></span>
+              <span class="toggle-label">Truncar tool outputs (-70%)
+                <span class="toggle-sub">post-procesar en el código antes de pasarle al modelo</span>
+              </span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="qw-hist">
+              <span class="check"></span>
+              <span class="toggle-label">Resumir historial cada N turnos (-60%)
+                <span class="toggle-sub">comprime turnos viejos a un summary estructurado</span>
+              </span>
+            </label>
+            <label class="toggle">
+              <input type="checkbox" id="qw-rag">
+              <span class="check"></span>
+              <span class="toggle-label">Bajar top-k del RAG a 4 con umbral
+                <span class="toggle-sub">si tu k actual es &gt; 4, lo reduce</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="sim-results">
+        <div class="readout">
+          <div class="readout-eyebrow">› gasto mensual estimado</div>
+          <div class="readout-big" id="r-month">—<span class="readout-unit">USD/mes</span></div>
+          <div class="readout-sub">
+            <div><span>POR LLAMADA</span><b id="r-call">—</b></div>
+            <div><span>POR DÍA</span><b id="r-day">—</b></div>
+            <div><span>TOK/LLAMADA</span><b id="r-tok">—</b></div>
+          </div>
+        </div>
+
+        <div class="readout savings" id="savings-card" style="display:none">
+          <div class="readout-eyebrow" style="color: var(--ok)">› ahorro con quick wins activos</div>
+          <div class="readout-big" id="r-saved">—<span class="readout-unit">USD/mes</span></div>
+          <div class="readout-sub">
+            <div><span>NUEVO MENSUAL</span><b id="r-new-month">—</b></div>
+            <div><span>REDUCCIÓN</span><b id="r-pct">—</b></div>
+          </div>
+        </div>
+
+        <div class="breakdown">
+          <div class="breakdown-title">› desglose del gasto por fuente</div>
+          <div class="bar-stack" id="bar-stack"></div>
+          <div class="bar-legend" id="bar-legend"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TAB 3: ÁRBOL DE DECISIÓN ============ -->
+  <section class="panel" id="arbol">
+    <div class="eyebrow">Diagnóstico</div>
+    <h2>¿Por dónde empezar a optimizar?</h2>
+    <p class="lead tree-intro">
+      Cuatro o cinco preguntas para llegar a la palanca correcta para tu caso.
+      No es un test, es una guía de orden de prioridad. Si tu respuesta es "no sé",
+      hay una rama para eso.
+    </p>
+
+    <div class="tree" id="tree-host">
+      <!-- Steps injected by JS -->
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="container">
+    <span>spartan it · taller interno · economía de tokens</span>
+    <span>los precios son referencia, verificar contra docs.anthropic.com</span>
+  </div>
+</footer>
+
+<script>
+// ========== TABS ==========
+const tabs = document.querySelectorAll('.tab');
+const panels = document.querySelectorAll('.panel');
+tabs.forEach(t => t.addEventListener('click', () => {
+  tabs.forEach(x => x.classList.remove('active'));
+  panels.forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById(t.dataset.panel).classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}));
+
+// ========== SIMULATION ==========
+const $ = id => document.getElementById(id);
+const fmt = n => n >= 1000 ? n.toLocaleString('es-AR', {maximumFractionDigits: 0}) : n.toFixed(0);
+const fmtUSD = n => n >= 100 ? n.toFixed(0) : n >= 10 ? n.toFixed(1) : n.toFixed(2);
+
+const COLORS = {
+  sys:  '#B86F1F',
+  hist: '#8A4F1A',
+  user: '#7C8A9C',
+  tool: '#A04030',
+  rag:  '#1E6B66',
+  think:'#6B4A8C',
+  resp: '#4F6B30',
+};
+
+const LABELS = {
+  sys:  'System prompt',
+  hist: 'Historial',
+  user: 'Input usuario',
+  tool: 'Tool outputs',
+  rag:  'RAG chunks',
+  think:'Thinking',
+  resp: 'Respuesta',
+};
+
+function calc() {
+  // Safe number getter — handles NaN, negatives, empty strings
+  const num = id => {
+    const v = parseFloat($(id).value);
+    return (isFinite(v) && v >= 0) ? v : 0;
+  };
+
+  const sel = $('model').selectedOptions[0];
+  const priceIn = parseFloat(sel.dataset.in);
+  const priceOut = parseFloat(sel.dataset.out);
+  const callsDay = num('calls-day');
+  const retryMult = Math.max(1, parseFloat($('retry-mult').value) || 1);
+
+  let sys = num('sys-prompt');
+  let hist = num('turns') * num('turn-size');
+  const user = num('user-input');
+  let tool = num('tools-n') * num('tool-size');
+  let rag = num('rag-k') * num('rag-size');
+  const think = num('thinking');
+  const resp = num('response');
+
+  // Base (no quick wins) — multiplicado por overhead de reintentos
+  const baseInput = sys + hist + user + tool + rag;
+  const baseOutput = think + resp;
+  const baseCostCall = ((baseInput / 1e6) * priceIn + (baseOutput / 1e6) * priceOut) * retryMult;
+  const baseDay = baseCostCall * callsDay;
+  const baseMonth = baseDay * 30;
+  const baseTok = baseInput + baseOutput;
+
+  // Apply quick wins
+  const qwCache = $('qw-cache').checked;
+  const qwSemCache = $('qw-semcache').checked;
+  const qwTrunc = $('qw-trunc').checked;
+  const qwHist = $('qw-hist').checked;
+  const qwRag = $('qw-rag').checked;
+
+  // Semantic cache reduces effective calls (30% hit rate assumed)
+  const semCacheFactor = qwSemCache ? 0.7 : 1.0;
+
+  let optSys = sys;
+  let optHist = qwHist ? hist * 0.4 : hist;
+  let optTool = qwTrunc ? tool * 0.3 : tool;
+  let optRag = (qwRag && (+$('rag-k').value || 0) > 4)
+    ? 4 * (+$('rag-size').value || 0)
+    : rag;
+
+  let costSys, costHist, costUser, costTool, costRag;
+  if (qwCache) {
+    // 90% off on system prompt reads (assume 95% of calls are cache hits after warmup)
+    const hitRate = 0.95;
+    const effectiveRate = (1 - hitRate) * 1 + hitRate * 0.1;
+    costSys = (optSys / 1e6) * priceIn * effectiveRate;
+  } else {
+    costSys = (optSys / 1e6) * priceIn;
+  }
+  costHist = (optHist / 1e6) * priceIn;
+  costUser = (user / 1e6) * priceIn;
+  costTool = (optTool / 1e6) * priceIn;
+  costRag = (optRag / 1e6) * priceIn;
+  const costThink = (think / 1e6) * priceOut;
+  const costResp = (resp / 1e6) * priceOut;
+
+  const optCall = (costSys + costHist + costUser + costTool + costRag + costThink + costResp) * retryMult;
+  const optDay = optCall * callsDay * semCacheFactor;
+  const optMonth = optDay * 30;
+
+  // Render main readout (always shows base values when no QW, opt when QW)
+  const anyQw = qwCache || qwSemCache || qwTrunc || qwHist || qwRag;
+  const displayMonth = anyQw ? optMonth : baseMonth;
+  const displayDay = anyQw ? optDay : baseDay;
+  const displayCall = anyQw ? optCall : baseCostCall;
+
+  $('r-month').innerHTML = `${fmtUSD(displayMonth)}<span class="readout-unit">USD/mes</span>`;
+  $('r-day').textContent = `$${fmtUSD(displayDay)}`;
+  $('r-call').textContent = `$${displayCall < 0.01 ? displayCall.toFixed(4) : displayCall.toFixed(3)}`;
+  $('r-tok').textContent = fmt(baseTok);
+
+  // Savings card
+  if (anyQw) {
+    const saved = baseMonth - optMonth;
+    const pct = baseMonth > 0 ? (saved / baseMonth) * 100 : 0;
+    $('savings-card').style.display = 'block';
+    $('r-saved').innerHTML = `${fmtUSD(saved)}<span class="readout-unit">USD/mes</span>`;
+    $('r-new-month').textContent = `$${fmtUSD(optMonth)}`;
+    $('r-pct').textContent = `−${pct.toFixed(0)}%`;
+  } else {
+    $('savings-card').style.display = 'none';
+  }
+
+  // Group costs in headers
+  $('cost-base').textContent = `$${fmtUSD(baseMonth)}/mes`;
+  const inputTok = sys + hist + user;
+  const toolsTok = tool + rag;
+  $('cost-input').textContent = `${fmt(inputTok)} tok`;
+  $('cost-tools').textContent = `${fmt(toolsTok)} tok`;
+  $('cost-output').textContent = `${fmt(baseOutput)} tok`;
+  $('cost-retry').textContent = `×${retryMult.toFixed(1)}`;
+  $('cost-retry').style.color = retryMult > 1.05 ? 'var(--danger)' : 'var(--text-3)';
+
+  // Breakdown (always show base distribution for clarity)
+  const segs = [
+    {k:'sys', v: sys},
+    {k:'hist', v: hist},
+    {k:'user', v: user},
+    {k:'tool', v: tool},
+    {k:'rag', v: rag},
+    {k:'think', v: think},
+    {k:'resp', v: resp},
+  ];
+  const total = segs.reduce((a,b) => a+b.v, 0) || 1;
+
+  // Stacked bar
+  $('bar-stack').innerHTML = segs.filter(s => s.v > 0).map(s =>
+    `<div class="bar-seg" style="width:${(s.v/total*100)}%; background:${COLORS[s.k]}" title="${LABELS[s.k]}: ${fmt(s.v)} tok"></div>`
+  ).join('');
+
+  // Legend with USD per segment
+  const priceForK = k => (k==='think' || k==='resp') ? priceOut : priceIn;
+  $('bar-legend').innerHTML = segs.filter(s => s.v > 0).map(s => {
+    const usd = (s.v / 1e6) * priceForK(s.k) * callsDay * 30;
+    return `
+      <div class="bar-row">
+        <span class="bar-swatch" style="background:${COLORS[s.k]}"></span>
+        <span>${LABELS[s.k]}</span>
+        <span class="bar-val">${fmt(s.v)} tok</span>
+        <span class="bar-pct">${(s.v/total*100).toFixed(0)}%</span>
+      </div>
+    `;
+  }).join('');
+}
+
+// Wire inputs
+const simInputs = document.querySelectorAll('#simulacion input, #simulacion select');
+
+// ----- localStorage persistence -----
+const STORAGE_KEY = 'spartan-tokens-sim-v1';
+
+function saveState() {
+  const state = {};
+  simInputs.forEach(el => {
+    if (el.type === 'checkbox') state[el.id] = el.checked;
+    else state[el.id] = el.value;
+  });
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    simInputs.forEach(el => {
+      if (state[el.id] === undefined) return;
+      if (el.type === 'checkbox') el.checked = state[el.id];
+      else el.value = state[el.id];
+    });
+  } catch(e) {}
+}
+
+loadState();
+
+simInputs.forEach(el => {
+  el.addEventListener('input', () => { calc(); saveState(); });
+  el.addEventListener('change', () => { calc(); saveState(); });
+});
+calc();
+
+// Reset button for cleared state
+const resetBtn = document.getElementById('sim-reset');
+if (resetBtn) {
+  resetBtn.addEventListener('click', () => {
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+    location.reload();
+  });
+}
+
+// ========== DECISION TREE ==========
+const tree = {
+  start: {
+    crumb: ['Inicio'],
+    q: '¿Tenés <span class="accent">medición</span> del gasto por llamada?',
+    help: 'Sin números, optimizar es adivinar. El API te devuelve usage detallado en cada respuesta.',
+    choices: [
+      {key:'A', text:'No, ni idea de cuánto pesa cada parte', sub:'Es lo normal para empezar', next:'measure'},
+      {key:'B', text:'Sí, ya sé dónde se concentra el gasto', sub:'Sabés qué bloque pesa más', next:'where'},
+      {key:'C', text:'A medias — logueo el total pero no el desglose', sub:'Tenés algo pero no es suficiente', next:'measure'},
+    ]
+  },
+  measure: {
+    crumb: ['Inicio', 'Sin medición'],
+    verdict: {
+      title: 'Instrumentá primero — una tarde de trabajo',
+      body: `
+        <p>Antes de tocar arquitectura o comprar herramientas, necesitás saber dónde se va la plata.
+        El paso previo a todo lo demás: loguear el objeto <code>usage</code> que el API ya devuelve gratis en cada respuesta.</p>
+        <p>Snippet base (Python, SDK oficial de Anthropic):</p>
+<pre style="background: #1A2230; border: 1px solid #2C3E54; padding: 16px; border-radius: 3px; overflow-x: auto; font-family: var(--mono); font-size: 12px; color: #B5BFCC; margin: 14px 0; line-height: 1.5;"><span style="color: #7C8A9C"># pip install anthropic</span>
+<span style="color: #9B7BB8">import</span> anthropic, json, time
+<span style="color: #9B7BB8">from</span> datetime <span style="color: #9B7BB8">import</span> datetime
+
+client = anthropic.Anthropic()
+
+<span style="color: #9B7BB8">def</span> <span style="color: #E8A23A">call_with_metrics</span>(system, messages, tools=<span style="color: #9B7BB8">None</span>, session_id=<span style="color: #7FB069">""</span>):
+    t0 = time.time()
+    resp = client.messages.create(
+        model=<span style="color: #7FB069">"claude-sonnet-4-6"</span>,
+        max_tokens=<span style="color: #E8A23A">1024</span>,
+        system=system,
+        messages=messages,
+        tools=tools <span style="color: #9B7BB8">or</span> [],
+    )
+    u = resp.usage
+    <span style="color: #7C8A9C"># las cuatro métricas que importan</span>
+    log = {
+        <span style="color: #7FB069">"ts"</span>: datetime.utcnow().isoformat(),
+        <span style="color: #7FB069">"session"</span>: session_id,
+        <span style="color: #7FB069">"latency_ms"</span>: <span style="color: #E8A23A">int</span>((time.time() - t0) * <span style="color: #E8A23A">1000</span>),
+        <span style="color: #7FB069">"input_tok"</span>: u.input_tokens,
+        <span style="color: #7FB069">"output_tok"</span>: u.output_tokens,
+        <span style="color: #7FB069">"cache_read"</span>: <span style="color: #E8A23A">getattr</span>(u, <span style="color: #7FB069">"cache_read_input_tokens"</span>, <span style="color: #E8A23A">0</span>),
+        <span style="color: #7FB069">"cache_write"</span>: <span style="color: #E8A23A">getattr</span>(u, <span style="color: #7FB069">"cache_creation_input_tokens"</span>, <span style="color: #E8A23A">0</span>),
+        <span style="color: #7C8A9C"># desglose que vos calculás del lado del cliente</span>
+        <span style="color: #7FB069">"sys_tok"</span>: estimate_tokens(system),
+        <span style="color: #7FB069">"hist_tok"</span>: <span style="color: #E8A23A">sum</span>(estimate_tokens(m[<span style="color: #7FB069">"content"</span>]) <span style="color: #9B7BB8">for</span> m <span style="color: #9B7BB8">in</span> messages[:-<span style="color: #E8A23A">1</span>]),
+        <span style="color: #7FB069">"user_tok"</span>: estimate_tokens(messages[-<span style="color: #E8A23A">1</span>][<span style="color: #7FB069">"content"</span>]),
+    }
+    <span style="color: #9B7BB8">with</span> <span style="color: #E8A23A">open</span>(<span style="color: #7FB069">"llm_usage.jsonl"</span>, <span style="color: #7FB069">"a"</span>) <span style="color: #9B7BB8">as</span> f:
+        f.write(json.dumps(log) + <span style="color: #7FB069">"\\n"</span>)
+    <span style="color: #9B7BB8">return</span> resp</pre>
+        <p>Para tool outputs, lo mismo: medilos en bytes/tokens antes de pasárselos al modelo y logueá el tamaño.
+        Con 50 sesiones reales en este formato, en una tarde tenés un <code>jsonl</code> que cargás a un DataFrame y
+        graficás. Ahí volvés al árbol y entrás por la rama "sí, sé dónde se concentra".</p>
+        <p style="font-size: 13px; color: var(--text-3); margin-top: 16px;">
+          <strong style="color: var(--amber)">Tip:</strong> para <code>estimate_tokens()</code> alcanza con <code>len(text) / 4</code> como aproximación.
+          Para mayor precisión usar el contador oficial del SDK (<code>client.messages.count_tokens()</code>).
+        </p>
+        <p style="font-size: 13px; color: var(--text-3); margin-top: 10px;">
+          <strong style="color: var(--amber)">Alternativa visual:</strong> si no querés mirar JSONL en una notebook,
+          <a href="https://langfuse.com" target="_blank" style="color: var(--amber); text-decoration: underline">Langfuse</a>
+          es open-source (MIT), se levanta en un Docker y te da dashboard de usage, traces y costo por sesión out-of-the-box.
+          Para Spartan IT que ya tiene infra GCP corriendo, sería una hora de setup.
+        </p>
+      `,
+      impact: [['Tiempo','~4 horas Alberto'], ['Costo','$0', 'ok'], ['Bloquea','todo lo demás']]
+    }
+  },
+  where: {
+    crumb: ['Inicio', 'Con medición'],
+    q: '¿<span class="accent">Qué bloque</span> domina tu gasto?',
+    help: 'Mirá la barra de desglose en la pestaña Simulación con tus números reales. La que te quema el 40%+ es por dónde empezás.',
+    choices: [
+      {key:'A', text:'System prompt + tools schema', sub:'Se repite igual en cada llamada', next:'cache'},
+      {key:'B', text:'Tool outputs (queries SQL, APIs)', sub:'JSON o filas gigantes', next:'truncate'},
+      {key:'C', text:'Historial conversacional', sub:'Sesiones largas con memoria', next:'summarize'},
+      {key:'D', text:'Chunks RAG', sub:'Demasiado contexto recuperado', next:'rag'},
+      {key:'E', text:'Output / thinking', sub:'El modelo escribe mucho', next:'output'},
+      {key:'F', text:'Queries que se repiten todo el tiempo', sub:'Mismas preguntas en distintas palabras', next:'semcache'},
+      {key:'G', text:'Está repartido, ninguno domina', sub:'No hay culpable claro', next:'mixed'},
+    ]
+  },
+  cache: {
+    crumb: ['Inicio', 'Con medición', 'System prompt'],
+    verdict: {
+      title: 'Prompt caching nativo de Anthropic',
+      body: `
+        <p>Esta es <strong>la palanca más fácil que existe</strong>: sin tocar tu arquitectura,
+        agregás un parámetro <code>cache_control</code> en el bloque del system prompt y
+        las lecturas cuestan <strong>10% del precio base</strong>.</p>
+        <p>Cómo:</p>
+        <ul>
+          <li>En el array de <code>system</code>, marcá los bloques estables con <code>cache_control: {type: "ephemeral"}</code>.</li>
+          <li>La primera llamada paga 1.25x (cache write). Las siguientes pagan 0.1x.</li>
+          <li>El cache dura 5 minutos por defecto, se renueva con cada uso. Para agente activo, prácticamente siempre hay hit.</li>
+          <li>Lo mismo aplica para el schema de tools si lo tenés grande.</li>
+        </ul>
+        <p>Sale en una tarde, no requiere cambios de arquitectura, y es 100% transparente
+        para el modelo (la respuesta es idéntica).</p>
+      `,
+      impact: [['Esfuerzo','1 tarde'], ['Ahorro típico','40–70%','ok'], ['Riesgo','muy bajo']]
+    }
+  },
+  truncate: {
+    crumb: ['Inicio', 'Con medición', 'Tool outputs'],
+    verdict: {
+      title: 'Truncar y estructurar tool outputs en el código',
+      body: `
+        <p>Acá la solución <strong>no está en el LLM, está en tu código</strong>. El modelo
+        no necesita 500 filas para responder un saldo. Trabajo de Alberto, no de la API.</p>
+        <p>Pasos concretos:</p>
+        <ul>
+          <li>Para queries SQL: agregar <code>LIMIT</code> agresivos y devolver agregados (SUM, COUNT) en lugar de filas crudas siempre que se pueda.</li>
+          <li>Para JSON de APIs: hacer un mapper que descarte campos que el modelo no usa.
+          De 80 campos por registro, probablemente le sirven 6.</li>
+          <li>Para listados largos: paginar y devolver "primeros N + total" en vez de todo.</li>
+          <li>Si el modelo necesita ver más, que lo pida con otro tool call. Es más barato hacer dos llamadas chicas que una con 50KB de contexto.</li>
+        </ul>
+        <p>Esta es la rama donde un compresor tipo <em>Headroom</em> sí podría aportar, si no querés
+        escribir post-procesamiento custom. Pero un mapper hecho a medida casi siempre rinde mejor
+        porque conocés tu dominio.</p>
+      `,
+      impact: [['Esfuerzo','1–2 días'], ['Ahorro típico','50–80%','ok'], ['Riesgo','medio (testing)']]
+    }
+  },
+  summarize: {
+    crumb: ['Inicio', 'Con medición', 'Historial'],
+    verdict: {
+      title: 'Resumir historial cada N turnos',
+      body: `
+        <p>El historial crece linealmente, pero el costo total de la sesión crece <strong>cuadráticamente</strong>
+        porque en cada turno reenviás todo lo anterior. Cortar eso es matemática pura.</p>
+        <p>Estrategia:</p>
+        <ul>
+          <li>A partir del turno 6 (ajustable), tomá los primeros 4 turnos y mandalos al modelo con un
+          prompt tipo "resumí esto en un bloque estructurado de máximo 200 tokens preservando: decisiones tomadas, datos del cliente, contexto activo".</li>
+          <li>Reemplazá esos 4 turnos por el resumen en el historial. Mantenés los últimos 2 sin tocar.</li>
+          <li>Es lo que hace Claude Code internamente con su "context editing".</li>
+        </ul>
+        <p>Pierde algo de fidelidad fina (matices conversacionales), pero para un agente transaccional
+        como el de la cerealera es totalmente aceptable.</p>
+      `,
+      impact: [['Esfuerzo','2–3 días'], ['Ahorro típico','40–60%','ok'], ['Riesgo','medio']]
+    }
+  },
+  rag: {
+    crumb: ['Inicio', 'Con medición', 'RAG'],
+    verdict: {
+      title: 'Tunear el retriever, no comprimir',
+      body: `
+        <p>Si los chunks RAG dominan el gasto, casi seguro estás trayendo demasiado.
+        El fix está en el retriever, no en el LLM.</p>
+        <p>Cambios a probar, en orden:</p>
+        <ul>
+          <li>Bajar <code>top_k</code> de 20 a 5. Medir calidad. Si baja imperceptiblemente, dejarlo así.</li>
+          <li>Agregar umbral de similitud: descartar chunks por debajo de 0.7 (ajustar según embedding).
+          Mejor 3 chunks relevantes que 10 con dos buenos y ocho mediocres.</li>
+          <li>Reducir tamaño de chunk: 250 tokens en lugar de 500, mejor solapamiento.</li>
+          <li>Re-ranker liviano (BGE-reranker chico) sobre los top-20 para quedarte con los top-3 reales.</li>
+        </ul>
+        <p>Para tu caso específico con BGE-M3, esto se ajusta en la indexación y el retrieval, no toca el LLM.</p>
+      `,
+      impact: [['Esfuerzo','1–3 días'], ['Ahorro típico','40–70%','ok'], ['Riesgo','medio (calidad)']]
+    }
+  },
+  output: {
+    crumb: ['Inicio', 'Con medición', 'Output'],
+    verdict: {
+      title: 'Acotar la respuesta y revisar thinking',
+      body: `
+        <p>El output cuesta 5x el input. Si tu modelo está generando respuestas largas
+        o pensando mucho, hay margen.</p>
+        <p>Cambios:</p>
+        <ul>
+          <li>En el system prompt, instrucción explícita: "respondé en máximo N palabras / un párrafo / formato estructurado breve".</li>
+          <li>Si activaste extended thinking sin necesidad clara, desactivalo. Para tareas transaccionales
+          (responder saldo, devolver stock) no aporta y multiplica el costo.</li>
+          <li>Para subtareas (extraer un campo, clasificar intención), usar Haiku en vez de Sonnet.
+          Costo 1/3, calidad suficiente para tareas simples.</li>
+          <li>Definir un <code>max_tokens</code> realista en el request. Default suelen ser muy altos.</li>
+        </ul>
+        <p>Este es el escenario donde un router de modelos (Haiku para simple, Sonnet para complejo)
+        tiene más sentido — encaja directo con tu arquitectura de router que ya tenés diseñada.</p>
+      `,
+      impact: [['Esfuerzo','1 día'], ['Ahorro típico','30–60%','ok'], ['Riesgo','bajo']]
+    }
+  },
+  semcache: {
+    crumb: ['Inicio', 'Con medición', 'Queries repetitivas'],
+    verdict: {
+      title: 'Caché semántico — la fuga más fácil para agentes B2B',
+      body: `
+        <p>Si las mismas preguntas vuelven una y otra vez (caso típico del bot de Luciana:
+        "saldo", "stock de fertilizante", "última factura"), <strong>pagar el LLM cada vez es derroche puro</strong>.
+        El caché semántico mide similitud entre la query nueva y queries ya respondidas, y si pasa el umbral,
+        devuelve la respuesta cacheada sin tocar el modelo.</p>
+        <p>Cómo armarlo (no necesitás herramienta externa):</p>
+        <ul>
+          <li>Embebé cada query del usuario con tu modelo de embeddings (BGE-M3 ya lo tenés para el lab clínico).</li>
+          <li>Guardá en pgvector pares (embedding, query, respuesta, ttl).</li>
+          <li>Antes de llamar al LLM: similitud coseno contra el cache. Si max > 0.92 y ttl válido, devolvé la respuesta cacheada.</li>
+          <li>TTL distinto por tipo de query: "saldo" expira en 1 hora, "horario de atención" expira en 30 días.</li>
+        </ul>
+        <p>Para el bot de la cerealera específicamente, esto puede capturar el 30–50% de las llamadas
+        (las preguntas repetitivas son el grueso del tráfico en soporte). Encaja directo con tu arquitectura
+        de "semantic similarity + cálculo determinístico" — el caché es la primera capa, el cálculo determinístico es la segunda.</p>
+        <p style="font-size: 13px; color: var(--text-3); margin-top: 14px;">
+          <strong style="color: var(--amber)">Cuidado:</strong> el TTL es lo que mata o salva esto.
+          Una respuesta de saldo cacheada por 24 horas es un error grave; cacheada 5 minutos es seguridad razonable.
+        </p>
+      `,
+      impact: [['Esfuerzo','3–5 días'], ['Ahorro típico','30–50%','ok'], ['Riesgo','medio (TTL crítico)']]
+    }
+  },
+  mixed: {
+    crumb: ['Inicio', 'Con medición', 'Mixto'],
+    q: '¿Tu volumen es <span class="accent">alto</span> y los outputs son verbosos?',
+    help: 'Cuando no hay un culpable claro, la decisión sobre herramientas externas (tipo Headroom) depende del perfil.',
+    choices: [
+      {key:'A', text:'Sí — miles de llamadas/día con tool outputs JSON gigantes', sub:'Logs SRE, builds, queries masivas', next:'headroom-yes'},
+      {key:'B', text:'No — volumen moderado, outputs medianos', sub:'Caso típico de un agente B2B', next:'headroom-no'},
+    ]
+  },
+  'headroom-yes': {
+    crumb: ['Inicio', 'Con medición', 'Mixto', 'Alto volumen'],
+    verdict: {
+      title: 'Probar Headroom (u otro compresor) en sandbox',
+      body: `
+        <p>Tu perfil encaja con los escenarios fuertes de Headroom: JSON grandes, logs verbosos,
+        agentes con muchas tool calls. <strong>Probar antes de adoptar.</strong></p>
+        <p>Plan de evaluación:</p>
+        <ul>
+          <li>Tomar 30 sesiones reales completas (las más caras).</li>
+          <li>Replicarlas con y sin Headroom como proxy.</li>
+          <li>Medir: tokens enviados, tokens facturados, latencia añadida, calidad de respuesta (review manual de Alberto).</li>
+          <li>Decidir con números, no con el README del proyecto.</li>
+        </ul>
+        <p>Si la calidad se sostiene y el ahorro real es ≥40%, vale la pena el riesgo de agregar una
+        pieza más en el pipeline. Si no, hacer post-procesamiento custom en los tool outputs específicos.</p>
+      `,
+      impact: [['Esfuerzo eval','1 semana'], ['Ahorro potencial','60–90%','ok'], ['Riesgo','medio (nueva pieza)']]
+    }
+  },
+  'headroom-no': {
+    crumb: ['Inicio', 'Con medición', 'Mixto', 'Volumen moderado'],
+    verdict: {
+      title: 'Combo de quick wins, no compresor genérico',
+      body: `
+        <p>Para tu perfil, Headroom no es la herramienta correcta. Los compresores genéricos
+        rinden cuando hay redundancia masiva; en flujos B2B moderados, los wins están en el diseño.</p>
+        <p>Plan, en este orden:</p>
+        <ul>
+          <li><strong>Semana 1</strong>: prompt caching del system prompt. Mide el efecto.</li>
+          <li><strong>Semana 2</strong>: tunear RAG (top-k, threshold).</li>
+          <li><strong>Semana 3</strong>: post-procesar los tool outputs más verbosos (mapper de campos).</li>
+          <li><strong>Semana 4</strong>: router de modelos (Haiku/Sonnet) según complejidad de la consulta. Esto encaja directo con tu arquitectura de query router tipo iptables.</li>
+        </ul>
+        <p>Cuatro semanas de trabajo focalizado, probablemente 60–75% de ahorro acumulado,
+        y todo es código tuyo — no agregás dependencias externas que después tenés que mantener.</p>
+      `,
+      impact: [['Esfuerzo','4 semanas'], ['Ahorro acumulado','60–75%','ok'], ['Riesgo','bajo (todo nativo)']]
+    }
+  },
+};
+
+const treeHost = document.getElementById('tree-host');
+let path = ['start'];
+
+function renderTree() {
+  const stepKey = path[path.length - 1];
+  const step = tree[stepKey];
+  let html = '<div class="tree-step active">';
+
+  // Breadcrumb
+  html += '<div class="crumb">';
+  step.crumb.forEach((c, i) => {
+    html += `<span class="crumb-item${i === step.crumb.length-1 ? ' curr' : ''}">${c}</span>`;
+    if (i < step.crumb.length-1) html += '<span class="crumb-sep">›</span>';
+  });
+  html += '</div>';
+
+  if (step.q) {
+    html += `<div class="question">${step.q}</div>`;
+    if (step.help) html += `<p class="question-help">${step.help}</p>`;
+    html += '<div class="choices">';
+    step.choices.forEach(c => {
+      html += `
+        <button class="choice" data-next="${c.next}">
+          <span class="choice-key">${c.key}</span>
+          <span class="choice-text">${c.text}${c.sub ? `<small>${c.sub}</small>` : ''}</span>
+        </button>
+      `;
+    });
+    html += '</div>';
+  } else if (step.verdict) {
+    html += `
+      <div class="verdict">
+        <h3>Recomendación</h3>
+        <div class="v-title">${step.verdict.title}</div>
+        <div class="v-body">${step.verdict.body}</div>
+        <div class="v-impact">
+          ${step.verdict.impact.map(([k,v,cls]) => `
+            <div class="${cls || ''}">${k}<b>${v}</b></div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  if (path.length > 1) {
+    html += '<button class="choice-back" id="tree-back">‹ volver</button>';
+  }
+  if (step.verdict) {
+    html += '<button class="choice-back" id="tree-restart" style="margin-left:8px">↺ empezar de nuevo</button>';
+  }
+
+  html += '</div>';
+  treeHost.innerHTML = html;
+
+  treeHost.querySelectorAll('.choice').forEach(b => {
+    b.addEventListener('click', () => {
+      path.push(b.dataset.next);
+      renderTree();
+    });
+  });
+  const back = document.getElementById('tree-back');
+  if (back) back.addEventListener('click', () => { path.pop(); renderTree(); });
+  const restart = document.getElementById('tree-restart');
+  if (restart) restart.addEventListener('click', () => { path = ['start']; renderTree(); });
+}
+renderTree();
+</script>
+
+</body>
+</html>
